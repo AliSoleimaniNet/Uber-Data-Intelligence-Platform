@@ -1,0 +1,116 @@
+[
+  {
+    "Plan": {
+      "Node Type": "Sort",
+      "Parallel Aware": false,
+      "Async Capable": false,
+      "Actual Rows": 15,
+      "Actual Loops": 1,
+      "Sort Key": ["(sum(ride_distance)) DESC"],
+      "Sort Method": "quicksort",
+      "Sort Space Used": 25,
+      "Sort Space Type": "Memory",
+      "Plans": [
+        {
+          "Node Type": "Aggregate",
+          "Strategy": "Sorted",
+          "Partial Mode": "Finalize",
+          "Parent Relationship": "Outer",
+          "Parallel Aware": false,
+          "Async Capable": false,
+          "Actual Rows": 15,
+          "Actual Loops": 1,
+          "Group Key": ["vehicle_type", "payment_method"],
+          "Plans": [
+            {
+              "Node Type": "Gather Merge",
+              "Parent Relationship": "Outer",
+              "Parallel Aware": false,
+              "Async Capable": false,
+              "Actual Rows": 45,
+              "Actual Loops": 1,
+              "Workers Planned": 2,
+              "Workers Launched": 2,
+              "Plans": [
+                {
+                  "Node Type": "Sort",
+                  "Parent Relationship": "Outer",
+                  "Parallel Aware": false,
+                  "Async Capable": false,
+                  "Actual Rows": 15,
+                  "Actual Loops": 3,
+                  "Sort Key": ["vehicle_type", "payment_method"],
+                  "Sort Method": "quicksort",
+                  "Sort Space Used": 26,
+                  "Sort Space Type": "Memory",
+                  "Workers": [
+                    {
+                      "Worker Number": 0,
+                      "Sort Method": "quicksort",
+                      "Sort Space Used": 26,
+                      "Sort Space Type": "Memory"
+                    },
+                    {
+                      "Worker Number": 1,
+                      "Sort Method": "quicksort",
+                      "Sort Space Used": 26,
+                      "Sort Space Type": "Memory"
+                    }
+                  ],
+                  "Plans": [
+                    {
+                      "Node Type": "Aggregate",
+                      "Strategy": "Hashed",
+                      "Partial Mode": "Partial",
+                      "Parent Relationship": "Outer",
+                      "Parallel Aware": false,
+                      "Async Capable": false,
+                      "Actual Rows": 15,
+                      "Actual Loops": 3,
+                      "Group Key": ["vehicle_type", "payment_method"],
+                      "HashAgg Batches": 1,
+                      "Peak Memory Usage": 24,
+                      "Disk Usage": 0,
+                      "Workers": [
+                        {
+                          "Worker Number": 0,
+                          "HashAgg Batches": 1,
+                          "Peak Memory Usage": 24,
+                          "Disk Usage": 0
+                        },
+                        {
+                          "Worker Number": 1,
+                          "HashAgg Batches": 1,
+                          "Peak Memory Usage": 24,
+                          "Disk Usage": 0
+                        }
+                      ],
+                      "Plans": [
+                        {
+                          "Node Type": "Seq Scan",
+                          "Parent Relationship": "Outer",
+                          "Parallel Aware": true,
+                          "Async Capable": false,
+                          "Relation Name": "dataset",
+                          "Alias": "dataset",
+                          "Actual Rows": 6303,
+                          "Actual Loops": 3,
+                          "Filter": "((booking_value > '300'::double precision) AND (ride_distance >= '5'::double precision) AND (ride_distance <= '50'::double precision) AND (booking_status = 'Completed'::text) AND (vehicle_type = ANY ('{\"Uber XL\",\"Premier Sedan\",\"Go Sedan\"}'::text[])))",
+                          "Rows Removed by Filter": 43286,
+                          "Workers": [
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    "Triggers": [
+    ]
+  }
+]

@@ -1,0 +1,24 @@
+@import "tailwindcss";
+
+@layer base {
+  :root {
+    --font-vazir: "Vazirmatn", ui-sans-serif, system-ui;
+    font-family: var(--font-vazir);
+  }
+}
+
+body {
+  background-color: #0f172a;
+  color: #e2e8f0;
+  direction: rtl;
+  text-align: right;
+}
+
+/* اسکرول‌بار شیک */
+::-webkit-scrollbar { width: 8px; }
+::-webkit-scrollbar-track { background: #1e293b; }
+::-webkit-scrollbar-thumb { 
+  background: #334155; 
+  border-radius: 10px; 
+}
+::-webkit-scrollbar-thumb:hover { background: #475569; }

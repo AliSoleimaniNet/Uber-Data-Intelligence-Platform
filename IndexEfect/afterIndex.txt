@@ -1,0 +1,63 @@
+[
+  {
+    "Plan": {
+      "Node Type": "Sort",
+      "Parallel Aware": false,
+      "Async Capable": false,
+      "Actual Rows": 15,
+      "Actual Loops": 1,
+      "Sort Key": ["(sum(ride_distance)) DESC"],
+      "Sort Method": "quicksort",
+      "Sort Space Used": 25,
+      "Sort Space Type": "Memory",
+      "Plans": [
+        {
+          "Node Type": "Aggregate",
+          "Strategy": "Hashed",
+          "Partial Mode": "Simple",
+          "Parent Relationship": "Outer",
+          "Parallel Aware": false,
+          "Async Capable": false,
+          "Actual Rows": 15,
+          "Actual Loops": 1,
+          "Group Key": ["vehicle_type", "payment_method"],
+          "HashAgg Batches": 1,
+          "Peak Memory Usage": 24,
+          "Disk Usage": 0,
+          "Plans": [
+            {
+              "Node Type": "Bitmap Heap Scan",
+              "Parent Relationship": "Outer",
+              "Parallel Aware": false,
+              "Async Capable": false,
+              "Relation Name": "dataset",
+              "Alias": "dataset",
+              "Actual Rows": 18908,
+              "Actual Loops": 1,
+              "Recheck Cond": "((booking_status = 'Completed'::text) AND (vehicle_type = ANY ('{\"Uber XL\",\"Premier Sedan\",\"Go Sedan\"}'::text[])) AND (booking_value > '300'::double precision))",
+              "Rows Removed by Index Recheck": 0,
+              "Filter": "((ride_distance >= '5'::double precision) AND (ride_distance <= '50'::double precision))",
+              "Rows Removed by Filter": 1251,
+              "Exact Heap Blocks": 3116,
+              "Lossy Heap Blocks": 0,
+              "Plans": [
+                {
+                  "Node Type": "Bitmap Index Scan",
+                  "Parent Relationship": "Outer",
+                  "Parallel Aware": false,
+                  "Async Capable": false,
+                  "Index Name": "idx_gold_performance",
+                  "Actual Rows": 20159,
+                  "Actual Loops": 1,
+                  "Index Cond": "((booking_status = 'Completed'::text) AND (vehicle_type = ANY ('{\"Uber XL\",\"Premier Sedan\",\"Go Sedan\"}'::text[])) AND (booking_value > '300'::double precision))"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    "Triggers": [
+    ]
+  }
+]

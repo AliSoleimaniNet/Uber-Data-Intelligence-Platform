@@ -1,0 +1,5 @@
+<Solution>
+  <Project Path="UberApi/UberApi.csproj" />
+  <Project Path="UberApp.AppHost/UberApp.AppHost.csproj" />
+  <Project Path="UberApp.ServiceDefaults/UberApp.ServiceDefaults.csproj" />
+</Solution>
