@@ -7,7 +7,8 @@ var postgres = builder.AddPostgres("postgres")
 
 var db = postgres.AddDatabase("uber-db");
 
-var qdrant = builder.AddQdrant("qdrant");
+var qdrant = builder.AddQdrant("qdrant")
+                      .WithDataVolume();
 
 var backend = builder.AddProject<Projects.UberApi>("uberapi")
        .WithReference(db)
