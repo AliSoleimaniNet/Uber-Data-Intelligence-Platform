@@ -15,11 +15,12 @@ namespace UberApi.Features.QdrantSync
             while (!stoppingToken.IsCancellationRequested)
             {
                 try { await SyncData(); }
-                catch (Exception ex) { logger.LogError(ex, "Sync Error"); }
+                catch (Exception ex) { logger.LogError(ex, "Sync failed"); }
 
-                await Task.Delay(TimeSpan.FromMinutes(2), stoppingToken); 
+                await Task.Delay(TimeSpan.FromMinutes(2), stoppingToken);
             }
         }
+
         private async Task SyncData()
         {
             using var scope = serviceProvider.CreateScope();
@@ -54,23 +55,23 @@ namespace UberApi.Features.QdrantSync
 
             if (idsToDelete.Count > 0 && idsToDelete.Count == qdrantIds.Count && dbGuids.Count > 0)
             {
-                logger.LogWarning("هشدار: سیستم قصد حذف تمام رکوردها را دارد. عملیات حذف متوقف شد تا بررسی بیشتری انجام شود.");
+                logger.LogWarning("Safety check triggered: Sync aborted to prevent full deletion.");
             }
             else if (idsToDelete.Any())
             {
                 await client.DeleteAsync(CollName, idsToDelete);
-                logger.LogInformation($"{idsToDelete.Count} مورد اضافی از Qdrant پاک شد.");
+                logger.LogInformation("Deleted {Count} orphaned records.", idsToDelete.Count);
             }
 
             var itemsToSync = dbData.Where(x => !qdrantIds.Contains(Guid.Parse(ToGuid(x.BookingId)))).ToList();
 
             if (!itemsToSync.Any())
             {
-                logger.LogInformation("دیتای جدیدی برای اضافه کردن وجود ندارد.");
+                logger.LogInformation("Sync complete: No new records.");
                 return;
             }
 
-            logger.LogInformation($"در حال تولید وکتور برای {itemsToSync.Count} رکورد جدید...");
+            logger.LogInformation("Embedding {Count} new records...", itemsToSync.Count);
 
             var syncTasks = new ConcurrentBag<PointStruct>();
 
@@ -86,7 +87,7 @@ namespace UberApi.Features.QdrantSync
                         Payload = { ["reason"] = item.Reason, ["booking_id"] = item.BookingId }
                     });
                 }
-                catch (Exception ex) { logger.LogError($"خطا در تولید وکتور برای {item.BookingId}: {ex.Message}"); }
+                catch (Exception ex) { logger.LogError("Embedding error for {Id}: {Msg}", item.BookingId, ex.Message); }
             });
 
             var pointsList = syncTasks.ToList();
@@ -96,8 +97,9 @@ namespace UberApi.Features.QdrantSync
                 await client.UpsertAsync(CollName, batch);
             }
 
-            logger.LogInformation($"همگام‌سازی با موفقیت انجام شد.");
+            logger.LogInformation("Sync successful. Active records: {Count}", dbData.Count);
         }
+
         private string ToGuid(string id) =>
             System.Security.Cryptography.MD5.HashData(System.Text.Encoding.UTF8.GetBytes(id))
             .Select(b => b.ToString("x2")).Aggregate((a, b) => a + b).Insert(8, "-").Insert(13, "-").Insert(18, "-").Insert(23, "-");
